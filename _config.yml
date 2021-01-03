@@ -107,8 +107,8 @@ analytics:
 # Site Author
 author:
   name             : "Tim Evdokimov"
-  avatar           : "/assets/images/bio-photo.jpg" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "Scala Developer at Lunatech."
+  avatar           : "/assets/images/bio-photo.png" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  bio              : "Reactive λ Backend Software Engineer"
   location         : "Amsterdam, The Netherlands"
   email            :
   links:
