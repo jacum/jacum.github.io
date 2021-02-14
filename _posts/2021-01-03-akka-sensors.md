@@ -78,9 +78,7 @@ Teams working with Akka usually chose to implement their own custom metrics for 
 
 [Akka Sensors](https://github.com/jacum/akka-sensors) is a new free open source (MIT) Scala library that instruments JVM and Akka explicitly, using native Prometheus collectors, with very low overhead, for high-load production use.
 
-The sources are here:
-
-https://github.com/jacum/akka-sensors
+The sources are [published on Github](https://github.com/jacum/akka-sensors).
 
 It is a greenfield implementation, not based on either Cinnamon or Kamon.
 
