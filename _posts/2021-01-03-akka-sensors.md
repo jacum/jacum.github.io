@@ -16,7 +16,7 @@ This takes a form of a `Runnable`: data (message) + a snippet of code that needs
 ## Dispatchers
 
 Therefore, at the heart of any reactive system, there is one or more *execution contexts*.
-An execution context, backed by some sort of worker pool, accepts the runnable in its inbound queue. 
+An execution context, backed by some sort of worker pool, accepts the `Runnable` in its inbound queue. 
 When one of the context workers becomes available, the `Runnable` is executed.
 
 In Akka runtime, a `Runnable` could be actor mailbox, processing one message, or just `ExecutionContext` that handles futures or IO monad materialisation.
@@ -46,7 +46,7 @@ So instead, you just open few of them and watch the following parameters:
 By tuning down the number of the workers to the necessary minimum, optimal latency is achieved.
 
 There also can be situations when in an otherwise balanced shop, one customer is having issues with his payment and needs to call her husband to top her card balance.
-This blocks the cachier - he can't do anything but wait - and all customers behind her, until she could pay (as you may have guessed, in a reactive system, it is a `Runnable` that behaves non-reactively, blocking thread for I/O or a mutex/lock).
+This blocks the cashier - he can't do anything but wait - and all customers behind her, until she could pay (as you may have guessed, in a reactive system, it is a `Runnable` that behaves non-reactively, blocking thread for I/O or a mutex/lock).
 We should't call the police yet (kill the thread), but a note must be made of that customer and her behaviour. 
 By tracking such 'misbehaving' customers and correcting them, we could ensure that our cashiers are never blocked. 
 
