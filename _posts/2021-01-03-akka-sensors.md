@@ -64,7 +64,7 @@ In addition, for persistent actors, that are recovered from durable storage:
 - how many recovery events were replayed to recover actor (class) and how much time did it take?
 - how much time a persistence actor (class) spends persisting an event?
 
-This is essential information, that will allow engineers identifying poor performance, excess resource use and root causes of incidents.
+This is essential information, that will allow engineers identify poor performance, excess resource use and root causes of incidents.
 
 ## Existing solutions for Akka
 
