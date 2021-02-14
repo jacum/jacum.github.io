@@ -8,12 +8,14 @@ tags:
 toc: true
 ---
 
-# Observability of a reactive system
+## Runnables
+Any reactive system, [by definition](https://www.reactivemanifesto.org/), wants to be responsive, resilient and elastic, and therefore can't be anything but message-driven. 
+Any action within such system is an asynchronous message that needs to be processed. 
+This takes a form of a `Runnable`: data (message) + a snippet of code that needs to be executed to process the data.
 
+## Dispatchers
 
-Any reactive system, by definition, is message-based. Messages need to be processed, applying some logics. 
-This takes a form of a `Runnable`: a short snippet of code that needs to be executed.
-Therefore, at the heart of any reactive system, there is one or more execution contexts.  
+Therefore, at the heart of any reactive system, there is one or more *execution contexts*.
 An execution context, backed by some sort of worker pool, accepts the runnable in its inbound queue. 
 When one of the context workers becomes available, the `Runnable` is executed.
 
@@ -64,9 +66,7 @@ In addition, for persistent actors, that are recovered from durable storage:
 
 This is essential information, that will allow engineers identifying poor performance, excess resource use and root causes of incidents.
 
-# Akka observability
-
-## Existing solutions
+## Existing solutions for Akka
 
 Akka itself is free open source software at its core (Apache license), but to use the great [Cinnamon telemetry library](https://developer.lightbend.com/docs/telemetry/current/home.html), commercial Lightbend subscription is required, which may not be affordable for every team.
 
@@ -98,16 +98,16 @@ Actor dashboard:
 Dispatcher dashboard:
 ![Dispatcher dashbord](https://github.com/jacum/akka-sensors/raw/master/docs/akka-dispatchers.png)
 
-# References
+## References
 
-## Akka
+### Akka
 Akka appeared in 2009. At its core is an implementation of actor model, as known from Erlang, rewritten in Scala. Actors are stateful entities, communicating with each other asynchronously, by passing messages around. Each actor is guaranteed to process just one message a time, allowing for lock-free mutable state updates.
 
 On top of actors keeping their state in memory, there is Akka Persistence, adding robust event sourcing, and Akka Cluster with Sharding to distribute persistent actor on available cluster nodes. Backed by scalable database such as Cassandra and scalable streaming such as Kafka, the result is a platform for nearly-infinite scalable system.
 
 It took few years to mature into industrial quality software, and now Akka is being successfully used highly concurrent event processing systems across wide variety of industries: from gambling to banking, and from postal logistics to IoT - where each millisecond in latency matters, and data is extremely valuable. Scaling such a system to process 10x times the current load is solved by adding hardware, but, generally, without rewriting any code.
 
-## Prometheus
+### Prometheus
 
 Prometheus is free open source (Apache) time-series database that is widely used to keep process metrics. 
 
