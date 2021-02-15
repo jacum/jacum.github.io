@@ -26,7 +26,7 @@ Assigning them to CPU cores and removing one worker to assign another involves c
 Hence, in an optimised low-latency reactive system, limited number of workers are occupying the cores all the time, without switching, 
 and just keep processing `Runnable`s as they come.
 
-To illustrate The following 'supermarket' methaphor could be applied.
+To illustrate The following 'supermarket' metaphor could be applied.
 
 ![Freepik image](/assets/images/supermarket.jpg)
 <sup>(image courtesy of Freepik)</sup>
@@ -45,7 +45,7 @@ So instead, you just open few of them and watch the following parameters:
 
 By tuning down the number of the workers to the necessary minimum, optimal latency is achieved.
 
-There also can be situations when in an otherwise balanced shop, one customer is having issues with his payment and needs to call her husband to top her card balance.
+There also can be situations when in an otherwise balanced shop, one customer is having issues with her payment and needs to call her husband to top the card balance.
 This blocks the cashier - he can't do anything but wait - and all customers behind her, until she could pay (as you may have guessed, in a reactive system, it is a `Runnable` that behaves non-reactively, blocking thread for I/O or a mutex/lock).
 We should't call the police yet (kill the thread), but a note must be made of that customer and her behaviour. 
 By tracking such 'misbehaving' customers and correcting them, we could ensure that our cashiers are never blocked. 

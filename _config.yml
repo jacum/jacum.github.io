@@ -79,7 +79,7 @@ analytics:
 author:
   name             : "Tim Evdokimov"
   avatar           : "/assets/images/bio-photo.png"
-  bio              : "Reasonably good at flatmapping monads, copy-pasting yamls and sarcasm."
+  bio              : "Reasonably good at flatmapping monads, handcrafting yamls and sarcasm."
   location         : "Amsterdam, The Netherlands"
   links:
     - label: "PragmaSoft"
