@@ -56,8 +56,8 @@ In a reactive system, actors are stateful entities, forming transaction boundari
 
 To understand the behaviour of the system under load, the following characteristics of an actor (a class of actors or any other group) must be monitored:
 - how many of a given actor (class) instances are active in memory and for how long? how often are actors passivated (receive timeout triggered)?
-- how much traffic does an actor (class) gets?
-- how much time an actor (class) spends on processing a message?
+- how much traffic does an actor (class) get?
+- how much time does an actor (class) spend on processing a message?
 - how many errors and unprocessed messages are there?
 
 In addition, for persistent actors, that are recovered from durable storage:
