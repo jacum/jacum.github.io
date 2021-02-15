@@ -1,0 +1,707 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.22.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>X Platform: applications, sharing state among multiple users in real time - Tim Evdokimov</title>
+<meta name="description" content="Real-time shared multi-user states with smooth scalability, flawless operations, quick feature delivery.">
+
+
+  <meta name="author" content="Tim Evdokimov">
+  
+  <meta property="article:author" content="Tim Evdokimov">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Tim Evdokimov">
+<meta property="og:title" content="X Platform: applications, sharing state among multiple users in real time">
+<meta property="og:url" content="https://jacum.github.io/platform/">
+
+
+  <meta property="og:description" content="Real-time shared multi-user states with smooth scalability, flawless operations, quick feature delivery.">
+
+
+
+  <meta property="og:image" content="https://jacum.github.io/assets/images/bio-photo.jpg">
+
+
+
+  <meta name="twitter:site" content="@mmistakes">
+  <meta name="twitter:title" content="X Platform: applications, sharing state among multiple users in real time">
+  <meta name="twitter:description" content="Real-time shared multi-user states with smooth scalability, flawless operations, quick feature delivery.">
+  <meta name="twitter:url" content="https://jacum.github.io/platform/">
+
+  
+    <meta name="twitter:card" content="summary">
+    
+      <meta name="twitter:image" content="https://jacum.github.io/assets/images/bio-photo.jpg">
+    
+  
+
+  
+
+
+
+  <meta property="article:published_time" content="2021-02-14T00:00:00+00:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="https://jacum.github.io/platform/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Tim Evdokimov",
+      "url": "https://jacum.github.io/",
+      "sameAs": ["https://twitter.com/","https://github.com/"]
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Tim Evdokimov Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+           
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/year-archive/">Posts</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/bio-photo.png" alt="Tim Evdokimov" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Tim Evdokimov</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Reasonably good at flatmapping monads, handcrafting yamls and sarcasm.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Amsterdam, The Netherlands</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://pragmasoft.nl" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">PragmaSoft</span></a></li>
+          
+        
+          
+            <li><a href="https://github.com/jacum" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="X Platform: applications, sharing state among multiple users in real time">
+    <meta itemprop="description" content="Real-time shared multi-user states with smooth scalability, flawless operations, quick feature delivery.">
+    <meta itemprop="datePublished" content="2021-02-14T00:00:00+00:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">X Platform: applications, sharing state among multiple users in real time
+</h1>
+          
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          7 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+              <ul class="toc__menu"><li><a href="#features">Features</a><ul><li><a href="#edge-and-state-nodes">Edge and state nodes</a></li><li><a href="#event-sourced-states">Event sourced states</a><ul><li><a href="#categories-and-ids">Categories and IDs</a></li><li><a href="#event-sourcing">Event sourcing</a></li><li><a href="#durability-and-recovery">Durability and recovery</a></li><li><a href="#state-proxies">State proxies</a></li></ul></li></ul></li><li><a href="#message-transport">Message transport</a><ul><li><a href="#inbound-traffic">Inbound traffic</a></li></ul></li><li><a href="#client-connections">Client connections</a><ul><li><a href="#security">Security</a></li><li><a href="#attributes">Attributes</a></li><li><a href="#connection-id">Connection ID</a></li><li><a href="#termination">Termination</a></li></ul></li></ul></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p>A high-level conceptual definition of a platform for stateful event processing with low latency is given.</p>
+
+<p><img src="/assets/images/architecture.png" alt="Perspective" /></p>
+
+<h1 id="features">Features</h1>
+<ul>
+  <li>Client connections
+    <ul>
+      <li>Optimised for low latency</li>
+      <li>Client/server latency measured and proactively monitored on all levels - also on the client for better UX</li>
+      <li>Connections on edge servers (smooth rollouts of updates, geo-expansion)</li>
+      <li>Two-way resilient communication between end user devices and the entities, persistent socket</li>
+      <li>The users perceive state change as immediate: In system message roundtrip p99 delays &lt;100ms</li>
+    </ul>
+  </li>
+  <li>Stateful entities
+    <ul>
+      <li>Large entities shared to 1000+ users, 1000+ updates per second.</li>
+      <li>Small entities (e.g. user states) 1M+ active users</li>
+      <li>Local platform states - strong consistency, CQRS/event sourcing for transactional integrity</li>
+      <li>Remote state proxies - eventual consistency, strong consistency via sync/remote system call</li>
+      <li>Durability: entity (inclusing all per-user states) is guaranteed to be recovered in &lt;1 second, even in case of severe failure.</li>
+      <li>Scalability: entities are independent, not locking each other resources, smooth horisontal upscaling by adding nodes</li>
+      <li>Caching: read models with tunable consistency, downstream aggregation</li>
+    </ul>
+  </li>
+  <li>Message transport
+    <ul>
+      <li>‘At most once’ delivery for messages between state nodes and edge nodes</li>
+      <li>Guarantees uniqueness of stateful entity receiving the message</li>
+      <li>Parallelisation and scaling of traffic</li>
+    </ul>
+  </li>
+  <li>Development and delivery
+    <ul>
+      <li>Sandbox model for functionality development and testing (pure domain-leve APIs for events, client messages)</li>
+      <li>Continuous delivery with minimal friction</li>
+      <li>Rolling updates: applications are updated without any noticeable downtime</li>
+    </ul>
+  </li>
+  <li>Extensible architecture:
+    <ul>
+      <li>User identity via JWT tokens</li>
+      <li>Clearly defined and well maintained APIs</li>
+      <li>Downstreaming events for live views, reporting, backoffices…</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="edge-and-state-nodes">Edge and state nodes</h2>
+
+<p>Nodes:</p>
+<ul>
+  <li>Edge nodes are the nodes to which end user devices (phones, browsers) are connected.</li>
+  <li>State nodes keep the actual state, as identifiable entities, in memory and as durable copy.</li>
+</ul>
+
+<p>Edges could be public or internal:</p>
+<ul>
+  <li>Public edge nodes can be located geographically close to the end users.</li>
+  <li>Internal edge nodes are located on premises, connecting special interfaces and devices with the system. 
+They could use either pull or push, any kind of API that the device needs.
+Authentication on the internal nodes is done by IP address or some other hard-wired way.</li>
+</ul>
+
+<p>State nodes’ location may be subject to regulations (where all stuff happens).</p>
+
+<p>Transport layer connects edge nodes with state nodes. Each edge or state node could be brought down gracefully transparently for the users, without any real-time process being disrupted.</p>
+
+<p>For development purposes, local/minimal transport is supported, to allow development and running functional tests in the same process.</p>
+
+<h2 id="event-sourced-states">Event sourced states</h2>
+
+<p>Event sourced, dynamically updated states are the core business of the platform.</p>
+
+<p>CIA levels:</p>
+<ul>
+  <li>confidentiality - only authorised users could access states</li>
+  <li>integrity - the state is at all times consistent</li>
+  <li>availability - the state is either available, or being recovered after switching from leaving node</li>
+</ul>
+
+<h3 id="categories-and-ids">Categories and IDs</h3>
+<p>By the nature of the objects they represent, stateful entities appear in several categories.
+Each category’s states differ in size (hundreds of bytes to some megabytes), the numbers of entities within category (1 (singleton), &lt;1000 or 1M+&gt;?) and how often they are updated/queried.</p>
+
+<p>Each entity has an ID unique within its category.</p>
+
+<p>Each state node can hold entities from multiple categories, the entity distribution layout (which node holds which share of which categories) could be configured.</p>
+
+<p>There may be dedicated ‘lanes’ in the transport layer - to allow tuning for QoS, etc. per class of communication/category.</p>
+
+<h3 id="event-sourcing">Event sourcing</h3>
+
+<p>State entities are implemented using CQRS/event sourcing paradigm.
+An entity processes one message at a time, decides whether or not it changes the state.
+If it does, an event is generated and persisted to durable storage. Then change is applied to the state.
+Finally, some messages could be sent back to the clients.</p>
+
+<p>API for a state entity includes logics for standard client messages like <code class="highlighter-rouge">connect</code> and <code class="highlighter-rouge">terminate(d)</code>, persistence journal, and outbound communication.</p>
+
+<p>All events, that change the state, are streamed down to <code class="highlighter-rouge">events</code> topic as part of state entity API, for secondary aggregation/display or offline reporting needs.</p>
+
+<p>The stream of events of an entity is also published for downstream consumers and bulding of read models (caches) across the platform.
+The platform API also supports creation of mirror entities, feeding on the stream of events from <code class="highlighter-rouge">events</code> topic and recovering the exact state.</p>
+
+<h3 id="durability-and-recovery">Durability and recovery</h3>
+<p>Event-sourced states uses event storage, durable database persisting state on physical media:</p>
+<ul>
+  <li>To save the stream of events</li>
+  <li>For eventual state recovery (snapshots + events)</li>
+</ul>
+
+<p>It is of vital importance to ensure instant recovery of the entities.
+If recovery from the primary persistence is not enough, an optimisation could be applied: at the cost of extra memory, each state node
+assigned to the domain, listens to <code class="highlighter-rouge">events</code> topic and keeps the mirrored state in memory.
+When the state needs to be recovered, the readily available state could be picked up from the memory immediately,
+without recovering it from persistent storage.</p>
+
+<h3 id="state-proxies">State proxies</h3>
+
+<p>To query and update state that is external to the platform, state proxies are used.
+By definition, it is not strongly consistent, unless explicitly requested from external primary source.
+For many uses, ‘last known good’ state may be sufficient, so the state proxy holds last known remote state and its timestamp.</p>
+
+<p>The state proxies support the following operations:</p>
+<ul>
+  <li>push state from primary (incoming update)</li>
+  <li>force pull state from primary</li>
+  <li>send state update command + force pull updated state (one atomic operation)</li>
+  <li>read cached ‘last known’ state</li>
+</ul>
+
+<h1 id="message-transport">Message transport</h1>
+
+<p>Message transport delivers messages from/to clients on the edges, and between stateful entities.</p>
+
+<p>It guarantees that the messages will be delivered to an entity on a given node, one at a time, and there will be just one such instance, per entity ID.</p>
+
+<p>Per message, delivery guarantee - at most once, with duplicates possible. The entities are responsible for
+idempotent message processing - assuming each message has unique ID, generated by its sender.</p>
+
+<p>It delivers messages from the clients to the state entities (inbound traffic) and from entities to the clients (outbound).
+It also delivers messages between the states.</p>
+
+<h2 id="inbound-traffic">Inbound traffic</h2>
+
+<p>Edge node uses entity ID as a key to guarantee that all these IDs are coming through the same partition, preserving the sequence.</p>
+
+<p>To save on latency, edge nodes do not parse the payload of the actual messages, passing it through, just using an envelope (entity ID as the key and adding connection ID and edge node own timestamp as attributes).</p>
+
+<p>Message transport guarantees to deliver messages addressed to an instance entity with certain ID, ensuring it is one and only one instance at all available state nodes.
+This prevents split-brain scenarios in which different states under the same ID exist.</p>
+
+<p>It is up to the state entity to process the message and ensure that it is valid and authorised, according to connection ID (JWT claims were sent in <code class="highlighter-rouge">connect</code> when the connection was established) and edge node timestamp, to apply time-related logics.</p>
+
+<p>Outbound messages (from stateful entities to the clients) contain a target lookup query, that targets either one client 
+connection by ID or all clients connected to a certain entity, maybe or some others.
+This allows saving on fan-out outbound traffic, when a message needs to be delivered to many clients at the same entity.
+All edge nodes listen to all messages in <code class="highlighter-rouge">outbound</code> channel and use the lookups to send them to locally connected clients.</p>
+
+<h1 id="client-connections">Client connections</h1>
+
+<p>End-user device establishes a websocket connection to the public edge node, using token issued by identity service
+for authorisation.</p>
+
+<p>The same device could establish and operation multiple connections at the same time, possibly via different edge nodes.</p>
+
+<p>Internal devices may connect to internal edges by various means, authentication is per IP address or somehow per device class.
+Internal edges may implement any kind of interface, e.g. HTTP push, HTTP pull, websocket or UART/serial port.</p>
+
+<h3 id="security">Security</h3>
+<p>Websocket HTTP upgrade request carries <code class="highlighter-rouge">Authorization: Bearer xxx</code> JWT token to authorise given client for connection.</p>
+
+<p>The connection, in its URL, always addresses some stateful entity, and there’s protocol in place for joining/leaving the state.
+Public edge node validates JWT token signature, and passes claims of the token are sent to the state entity in the initial <code class="highlighter-rouge">connect</code> message.
+The entity either accepts the client and sends state update message, or sends <code class="highlighter-rouge">terminate</code> if the claims are not accepted.
+When connection is dropped by client, <code class="highlighter-rouge">disconnect</code> message is sent to the entity, that could schedule handling of disconnect or wait till eventual <code class="highlighter-rouge">reconnect</code>.</p>
+
+<p>The claims in the token may contain specific end user roles, so the stateful entity knows who of the connected users is entitled to what.</p>
+
+<h3 id="attributes">Attributes</h3>
+<p>Each connection has the following attributes:</p>
+<ul>
+  <li>connection ID - to track zombie connections/refreshes</li>
+  <li>entity domain (uses same communication channel)</li>
+  <li>domain entity ID (aggregate root within a domain)</li>
+</ul>
+
+<h3 id="connection-id">Connection ID</h3>
+<p>Connection ID is generated as UUID by the client. Node doesn’t care about the ID content and assumes it’s just an unique string, long enough to prevent “insecure direct object reference” kind of guess attack.
+When a connection is dropped, client is required to reconnect keeping the same connection ID.</p>
+
+<h3 id="termination">Termination</h3>
+<p>Edge node, on request of the state entity or otherwise, can send <code class="highlighter-rouge">terminate</code> message requesting end user device to close connection and either reconnect or go away.
+In particular, client connection is terminated upon session timeout or a forced logout.
+When client just goes away and closes the connection (in fact, when any kind of socket exception kills the connection), <code class="highlighter-rouge">terminated</code> message is sent
+to the state entity. It is up to state entity to wait if the client comes back, ‘remembering’ him for some grace period, hoping that
+he comes back after a while, with same connection ID, applying any kind of custom ‘cleanup’ logics.</p>
+
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#concept" class="page__taxonomy-item" rel="tag">concept</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2021-02-14T00:00:00+00:00">February 14, 2021</time></p>
+
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?via=mmistakes&text=X+Platform%3A+applications%2C+sharing+state+among+multiple+users+in+real+time%20https%3A%2F%2Fjacum.github.io%2Fplatform%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fjacum.github.io%2Fplatform%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fjacum.github.io%2Fplatform%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/akka-sensors/" class="pagination--pager" title="Observability of a reactive system: Introducing Akka Sensors
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/akka-sensors/" rel="permalink">Observability of a reactive system: Introducing Akka Sensors
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Inline explicit instrumentation of Akka with Prometheus, with negligible overhead, open-source (MIT) and suitable for production use.
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://github.com/jacum" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2021 Tim Evdokimov. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

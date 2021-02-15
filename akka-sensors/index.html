@@ -1,0 +1,617 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.22.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Observability of a reactive system: Introducing Akka Sensors - Tim Evdokimov</title>
+<meta name="description" content="Inline explicit instrumentation of Akka with Prometheus, with negligible overhead, open-source (MIT) and suitable for production use.">
+
+
+  <meta name="author" content="Tim Evdokimov">
+  
+  <meta property="article:author" content="Tim Evdokimov">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Tim Evdokimov">
+<meta property="og:title" content="Observability of a reactive system: Introducing Akka Sensors">
+<meta property="og:url" content="https://jacum.github.io/akka-sensors/">
+
+
+  <meta property="og:description" content="Inline explicit instrumentation of Akka with Prometheus, with negligible overhead, open-source (MIT) and suitable for production use.">
+
+
+
+  <meta property="og:image" content="https://jacum.github.io/assets/images/bio-photo.jpg">
+
+
+
+  <meta name="twitter:site" content="@mmistakes">
+  <meta name="twitter:title" content="Observability of a reactive system: Introducing Akka Sensors">
+  <meta name="twitter:description" content="Inline explicit instrumentation of Akka with Prometheus, with negligible overhead, open-source (MIT) and suitable for production use.">
+  <meta name="twitter:url" content="https://jacum.github.io/akka-sensors/">
+
+  
+    <meta name="twitter:card" content="summary">
+    
+      <meta name="twitter:image" content="https://jacum.github.io/assets/images/bio-photo.jpg">
+    
+  
+
+  
+
+
+
+  <meta property="article:published_time" content="2021-01-03T00:00:00+00:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="https://jacum.github.io/akka-sensors/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Tim Evdokimov",
+      "url": "https://jacum.github.io/",
+      "sameAs": ["https://twitter.com/","https://github.com/"]
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Tim Evdokimov Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+           
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/year-archive/">Posts</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">Toggle search</span>
+          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
+            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
+          </svg>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/bio-photo.png" alt="Tim Evdokimov" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Tim Evdokimov</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>Reasonably good at flatmapping monads, handcrafting yamls and sarcasm.</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Amsterdam, The Netherlands</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://pragmasoft.nl" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-link" aria-hidden="true"></i><span class="label">PragmaSoft</span></a></li>
+          
+        
+          
+            <li><a href="https://github.com/jacum" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Observability of a reactive system: Introducing Akka Sensors">
+    <meta itemprop="description" content="Inline explicit instrumentation of Akka with Prometheus, with negligible overhead, open-source (MIT) and suitable for production use.">
+    <meta itemprop="datePublished" content="2021-01-03T00:00:00+00:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Observability of a reactive system: Introducing Akka Sensors
+</h1>
+          
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          5 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+              <ul class="toc__menu"><li><a href="#runnables">Runnables</a></li><li><a href="#dispatchers">Dispatchers</a></li><li><a href="#actors">Actors</a></li><li><a href="#existing-solutions-for-akka">Existing solutions for Akka</a></li><li><a href="#akka-sensors">Akka Sensors</a></li><li><a href="#references">References</a><ul><li><a href="#akka">Akka</a></li><li><a href="#prometheus">Prometheus</a></li></ul></li></ul>
+
+            </nav>
+          </aside>
+        
+        <h2 id="runnables">Runnables</h2>
+<p>Any reactive system, <a href="https://www.reactivemanifesto.org/">by definition</a>, wants to be responsive, resilient and elastic, and therefore can’t be anything but message-driven. 
+Any action within such system is an asynchronous message that needs to be processed. 
+This takes a form of a <code class="highlighter-rouge">Runnable</code>: data (message) + a snippet of code that needs to be executed to process the data.</p>
+
+<h2 id="dispatchers">Dispatchers</h2>
+
+<p>Therefore, at the heart of any reactive system, there is one or more <em>execution contexts</em>.
+An execution context, backed by some sort of worker pool, accepts the <code class="highlighter-rouge">Runnable</code> in its inbound queue. 
+When one of the context workers becomes available, the <code class="highlighter-rouge">Runnable</code> is executed.</p>
+
+<p>In Akka runtime, a <code class="highlighter-rouge">Runnable</code> could be actor mailbox, processing one message, or just <code class="highlighter-rouge">ExecutionContext</code> that handles futures or IO monad materialisation.</p>
+
+<p>It is important to keep the number of worker to a healthy minimum: keeping too many idle workers incurs overhead. 
+Assigning them to CPU cores and removing one worker to assign another involves core context switch and is even more expensive.
+Hence, in an optimised low-latency reactive system, limited number of workers are occupying the cores all the time, without switching, 
+and just keep processing <code class="highlighter-rouge">Runnable</code>s as they come.</p>
+
+<p>To illustrate The following ‘supermarket’ metaphor could be applied.</p>
+
+<p><img src="/assets/images/supermarket.jpg" alt="Freepik image" />
+<sup>(image courtesy of Freepik)</sup></p>
+
+<ul>
+  <li><code class="highlighter-rouge">Runnable</code>s are customers</li>
+  <li>worker threads are the cashiers</li>
+  <li>CPU cores are the cash registers</li>
+</ul>
+
+<p>If you are efficient supermarket manager, you want your customers to spend as little time in a queue as possible.</p>
+
+<p>You could achieve that by opening many cash registers, but these are expensive and having them idle wastes money.
+So instead, you just open few of them and watch the following parameters:</p>
+<ul>
+  <li>how much time a customer waited in a queue before being served? (queue time)</li>
+  <li>how much time a customer spent being served by cashier? (run time)</li>
+  <li>how many workers are actually occupied serving customers? (active workers)</li>
+</ul>
+
+<p>By tuning down the number of the workers to the necessary minimum, optimal latency is achieved.</p>
+
+<p>There also can be situations when in an otherwise balanced shop, one customer is having issues with her payment and needs to call her husband to top the card balance.
+This blocks the cashier - he can’t do anything but wait - and all customers behind her, until she could pay (as you may have guessed, in a reactive system, it is a <code class="highlighter-rouge">Runnable</code> that behaves non-reactively, blocking thread for I/O or a mutex/lock).
+We should’t call the police yet (kill the thread), but a note must be made of that customer and her behaviour. 
+By tracking such ‘misbehaving’ customers and correcting them, we could ensure that our cashiers are never blocked.</p>
+
+<h2 id="actors">Actors</h2>
+
+<p>In a reactive system, actors are stateful entities, forming transaction boundaries and guarding state integrity.</p>
+
+<p>To understand the behaviour of the system under load, the following characteristics of an actor (a class of actors or any other group) must be monitored:</p>
+<ul>
+  <li>how many of a given actor (class) instances are active in memory and for how long? how often are actors passivated (receive timeout triggered)?</li>
+  <li>how much traffic does an actor (class) get?</li>
+  <li>how much time does an actor (class) spend on processing a message?</li>
+  <li>how many errors and unprocessed messages are there?</li>
+</ul>
+
+<p>In addition, for persistent actors, that are recovered from durable storage:</p>
+<ul>
+  <li>how many recovery events were replayed to recover actor (class) and how much time did it take?</li>
+  <li>how much time a persistence actor (class) spends persisting an event?</li>
+</ul>
+
+<p>This is essential information, that will allow engineers identify poor performance, excess resource use and root causes of incidents.</p>
+
+<h2 id="existing-solutions-for-akka">Existing solutions for Akka</h2>
+
+<p>Akka itself is free open source software at its core (Apache license), but to use the great <a href="https://developer.lightbend.com/docs/telemetry/current/home.html">Cinnamon telemetry library</a>, commercial Lightbend subscription is required, which may not be affordable for every team.</p>
+
+<p>As alternative, there is a metrics library called <a href="https://kamon.io/">Kamon</a>, using attached agent and bytecode instrumentation, to expose Akka metrics. Kamon is suitable for testing and moderate loads, but by nature of its instrumentation, it adds too much overhead that can’t be acceptable in high-load production environments.</p>
+
+<p>Teams working with Akka usually chose to implement their own custom metrics for Akka in production.</p>
+
+<h2 id="akka-sensors">Akka Sensors</h2>
+
+<p><a href="https://github.com/jacum/akka-sensors">Akka Sensors</a> is a new free open source (MIT) Scala library that instruments JVM and Akka explicitly, using native Prometheus collectors, with very low overhead, for high-load production use.</p>
+
+<p>The sources are <a href="https://github.com/jacum/akka-sensors">published on Github</a>.</p>
+
+<p>It is a greenfield implementation, not based on either Cinnamon or Kamon.</p>
+
+<p>While the library itself is new as a package, the approaches and techniques applied are distilled from many years of production experience, implementing ad-hoc custom Akka/Prometheus metrics development, and from some OSS projects.</p>
+
+<p>Key measurements performed on running actors, Akka dispatchers, Cassandra client. An optional ‘runnable watcher’, configurable per dispatcher, keeps an eye on runnables, reporting stack traces of those rogue ones, hanging too long on non-reactive activities: e.g. waiting for locks, or doing blocking I/O.</p>
+
+<p>Collected metrics are indeed not as extensive as with Cinnamon, at the moment, most notably lacking the automatic instrumentation for cluster/sharding and remote traffic between cluster nodes.</p>
+
+<p>It comes with set of pre-configured Grafana boards and example application (<a href="https://http4s.org">http4s API</a> + Akka + <a href="https://cassandra.apache.org/">Cassandra</a>).</p>
+
+<p>Actor dashboard:
+<img src="https://github.com/jacum/akka-sensors/raw/master/docs/akka-actors.png" alt="Actor dashbord" /></p>
+
+<p>Dispatcher dashboard:
+<img src="https://github.com/jacum/akka-sensors/raw/master/docs/akka-dispatchers.png" alt="Dispatcher dashbord" /></p>
+
+<h2 id="references">References</h2>
+
+<h3 id="akka">Akka</h3>
+<p>Akka appeared in 2009. At its core is an implementation of actor model, as known from Erlang, rewritten in Scala. Actors are stateful entities, communicating with each other asynchronously, by passing messages around. Each actor is guaranteed to process just one message a time, allowing for lock-free mutable state updates.</p>
+
+<p>On top of actors keeping their state in memory, there is Akka Persistence, adding robust event sourcing, and Akka Cluster with Sharding to distribute persistent actor on available cluster nodes. Backed by scalable database such as Cassandra and scalable streaming such as Kafka, the result is a platform for nearly-infinite scalable system.</p>
+
+<p>It took few years to mature into industrial quality software, and now Akka is being successfully used highly concurrent event processing systems across wide variety of industries: from gambling to banking, and from postal logistics to IoT - where each millisecond in latency matters, and data is extremely valuable. Scaling such a system to process 10x times the current load is solved by adding hardware, but, generally, without rewriting any code.</p>
+
+<h3 id="prometheus">Prometheus</h3>
+
+<p>Prometheus is free open source (Apache) time-series database that is widely used to keep process metrics.</p>
+
+<p>Prometheus collectors for JVM could be enhanced with any kind of metrics to collect, using very low-overhead concurrent JVM primitives.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#akka" class="page__taxonomy-item" rel="tag">akka</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2021-01-03T00:00:00+00:00">January 3, 2021</time></p>
+
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?via=mmistakes&text=Observability+of+a+reactive+system%3A+Introducing+Akka+Sensors%20https%3A%2F%2Fjacum.github.io%2Fakka-sensors%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fjacum.github.io%2Fakka-sensors%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fjacum.github.io%2Fakka-sensors%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="#" class="pagination--pager disabled">Previous</a>
+    
+    
+      <a href="/platform/" class="pagination--pager" title="X Platform: applications, sharing state among multiple users in real time
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/platform/" rel="permalink">X Platform: applications, sharing state among multiple users in real time
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          6 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Real-time shared multi-user states with smooth scalability, flawless operations, quick feature delivery.
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';">
+    <label class="sr-only" for="search">
+      Enter your search term...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="Enter your search term..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://github.com/jacum" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2021 Tim Evdokimov. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

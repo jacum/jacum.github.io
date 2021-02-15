@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://jacum.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://jacum.github.io/" rel="alternate" type="text/html" /><updated>2021-02-15T09:44:40+00:00</updated><id>https://jacum.github.io/feed.xml</id><title type="html">Tim Evdokimov</title><subtitle>Notes and articles</subtitle><author><name>Tim Evdokimov</name></author><entry><title type="html">X Platform: applications, sharing state among multiple users in real time</title><link href="https://jacum.github.io/platform/" rel="alternate" type="text/html" title="X Platform: applications, sharing state among multiple users in real time" /><published>2021-02-14T00:00:00+00:00</published><updated>2021-02-14T00:00:00+00:00</updated><id>https://jacum.github.io/platform</id><content type="html" xml:base="https://jacum.github.io/platform/">&lt;p&gt;A high-level conceptual definition of a platform for stateful event processing with low latency is given.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/architecture.png&quot; alt=&quot;Perspective&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;features&quot;&gt;Features&lt;/h1&gt;
+&lt;ul&gt;
+  &lt;li&gt;Client connections
+    &lt;ul&gt;
+      &lt;li&gt;Optimised for low latency&lt;/li&gt;
+      &lt;li&gt;Client/server latency measured and proactively monitored on all levels - also on the client for better UX&lt;/li&gt;
+      &lt;li&gt;Connections on edge servers (smooth rollouts of updates, geo-expansion)&lt;/li&gt;
+      &lt;li&gt;Two-way resilient communication between end user devices and the entities, persistent socket&lt;/li&gt;
+      &lt;li&gt;The users perceive state change as immediate: In system message roundtrip p99 delays &amp;lt;100ms&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Stateful entities
+    &lt;ul&gt;
+      &lt;li&gt;Large entities shared to 1000+ users, 1000+ updates per second.&lt;/li&gt;
+      &lt;li&gt;Small entities (e.g. user states) 1M+ active users&lt;/li&gt;
+      &lt;li&gt;Local platform states - strong consistency, CQRS/event sourcing for transactional integrity&lt;/li&gt;
+      &lt;li&gt;Remote state proxies - eventual consistency, strong consistency via sync/remote system call&lt;/li&gt;
+      &lt;li&gt;Durability: entity (inclusing all per-user states) is guaranteed to be recovered in &amp;lt;1 second, even in case of severe failure.&lt;/li&gt;
+      &lt;li&gt;Scalability: entities are independent, not locking each other resources, smooth horisontal upscaling by adding nodes&lt;/li&gt;
+      &lt;li&gt;Caching: read models with tunable consistency, downstream aggregation&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Message transport
+    &lt;ul&gt;
+      &lt;li&gt;‘At most once’ delivery for messages between state nodes and edge nodes&lt;/li&gt;
+      &lt;li&gt;Guarantees uniqueness of stateful entity receiving the message&lt;/li&gt;
+      &lt;li&gt;Parallelisation and scaling of traffic&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Development and delivery
+    &lt;ul&gt;
+      &lt;li&gt;Sandbox model for functionality development and testing (pure domain-leve APIs for events, client messages)&lt;/li&gt;
+      &lt;li&gt;Continuous delivery with minimal friction&lt;/li&gt;
+      &lt;li&gt;Rolling updates: applications are updated without any noticeable downtime&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Extensible architecture:
+    &lt;ul&gt;
+      &lt;li&gt;User identity via JWT tokens&lt;/li&gt;
+      &lt;li&gt;Clearly defined and well maintained APIs&lt;/li&gt;
+      &lt;li&gt;Downstreaming events for live views, reporting, backoffices…&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;edge-and-state-nodes&quot;&gt;Edge and state nodes&lt;/h2&gt;
+
+&lt;p&gt;Nodes:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Edge nodes are the nodes to which end user devices (phones, browsers) are connected.&lt;/li&gt;
+  &lt;li&gt;State nodes keep the actual state, as identifiable entities, in memory and as durable copy.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Edges could be public or internal:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Public edge nodes can be located geographically close to the end users.&lt;/li&gt;
+  &lt;li&gt;Internal edge nodes are located on premises, connecting special interfaces and devices with the system. 
+They could use either pull or push, any kind of API that the device needs.
+Authentication on the internal nodes is done by IP address or some other hard-wired way.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;State nodes’ location may be subject to regulations (where all stuff happens).&lt;/p&gt;
+
+&lt;p&gt;Transport layer connects edge nodes with state nodes. Each edge or state node could be brought down gracefully transparently for the users, without any real-time process being disrupted.&lt;/p&gt;
+
+&lt;p&gt;For development purposes, local/minimal transport is supported, to allow development and running functional tests in the same process.&lt;/p&gt;
+
+&lt;h2 id=&quot;event-sourced-states&quot;&gt;Event sourced states&lt;/h2&gt;
+
+&lt;p&gt;Event sourced, dynamically updated states are the core business of the platform.&lt;/p&gt;
+
+&lt;p&gt;CIA levels:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;confidentiality - only authorised users could access states&lt;/li&gt;
+  &lt;li&gt;integrity - the state is at all times consistent&lt;/li&gt;
+  &lt;li&gt;availability - the state is either available, or being recovered after switching from leaving node&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;categories-and-ids&quot;&gt;Categories and IDs&lt;/h3&gt;
+&lt;p&gt;By the nature of the objects they represent, stateful entities appear in several categories.
+Each category’s states differ in size (hundreds of bytes to some megabytes), the numbers of entities within category (1 (singleton), &amp;lt;1000 or 1M+&amp;gt;?) and how often they are updated/queried.&lt;/p&gt;
+
+&lt;p&gt;Each entity has an ID unique within its category.&lt;/p&gt;
+
+&lt;p&gt;Each state node can hold entities from multiple categories, the entity distribution layout (which node holds which share of which categories) could be configured.&lt;/p&gt;
+
+&lt;p&gt;There may be dedicated ‘lanes’ in the transport layer - to allow tuning for QoS, etc. per class of communication/category.&lt;/p&gt;
+
+&lt;h3 id=&quot;event-sourcing&quot;&gt;Event sourcing&lt;/h3&gt;
+
+&lt;p&gt;State entities are implemented using CQRS/event sourcing paradigm.
+An entity processes one message at a time, decides whether or not it changes the state.
+If it does, an event is generated and persisted to durable storage. Then change is applied to the state.
+Finally, some messages could be sent back to the clients.&lt;/p&gt;
+
+&lt;p&gt;API for a state entity includes logics for standard client messages like &lt;code class=&quot;highlighter-rouge&quot;&gt;connect&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;terminate(d)&lt;/code&gt;, persistence journal, and outbound communication.&lt;/p&gt;
+
+&lt;p&gt;All events, that change the state, are streamed down to &lt;code class=&quot;highlighter-rouge&quot;&gt;events&lt;/code&gt; topic as part of state entity API, for secondary aggregation/display or offline reporting needs.&lt;/p&gt;
+
+&lt;p&gt;The stream of events of an entity is also published for downstream consumers and bulding of read models (caches) across the platform.
+The platform API also supports creation of mirror entities, feeding on the stream of events from &lt;code class=&quot;highlighter-rouge&quot;&gt;events&lt;/code&gt; topic and recovering the exact state.&lt;/p&gt;
+
+&lt;h3 id=&quot;durability-and-recovery&quot;&gt;Durability and recovery&lt;/h3&gt;
+&lt;p&gt;Event-sourced states uses event storage, durable database persisting state on physical media:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;To save the stream of events&lt;/li&gt;
+  &lt;li&gt;For eventual state recovery (snapshots + events)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;It is of vital importance to ensure instant recovery of the entities.
+If recovery from the primary persistence is not enough, an optimisation could be applied: at the cost of extra memory, each state node
+assigned to the domain, listens to &lt;code class=&quot;highlighter-rouge&quot;&gt;events&lt;/code&gt; topic and keeps the mirrored state in memory.
+When the state needs to be recovered, the readily available state could be picked up from the memory immediately,
+without recovering it from persistent storage.&lt;/p&gt;
+
+&lt;h3 id=&quot;state-proxies&quot;&gt;State proxies&lt;/h3&gt;
+
+&lt;p&gt;To query and update state that is external to the platform, state proxies are used.
+By definition, it is not strongly consistent, unless explicitly requested from external primary source.
+For many uses, ‘last known good’ state may be sufficient, so the state proxy holds last known remote state and its timestamp.&lt;/p&gt;
+
+&lt;p&gt;The state proxies support the following operations:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;push state from primary (incoming update)&lt;/li&gt;
+  &lt;li&gt;force pull state from primary&lt;/li&gt;
+  &lt;li&gt;send state update command + force pull updated state (one atomic operation)&lt;/li&gt;
+  &lt;li&gt;read cached ‘last known’ state&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;message-transport&quot;&gt;Message transport&lt;/h1&gt;
+
+&lt;p&gt;Message transport delivers messages from/to clients on the edges, and between stateful entities.&lt;/p&gt;
+
+&lt;p&gt;It guarantees that the messages will be delivered to an entity on a given node, one at a time, and there will be just one such instance, per entity ID.&lt;/p&gt;
+
+&lt;p&gt;Per message, delivery guarantee - at most once, with duplicates possible. The entities are responsible for
+idempotent message processing - assuming each message has unique ID, generated by its sender.&lt;/p&gt;
+
+&lt;p&gt;It delivers messages from the clients to the state entities (inbound traffic) and from entities to the clients (outbound).
+It also delivers messages between the states.&lt;/p&gt;
+
+&lt;h2 id=&quot;inbound-traffic&quot;&gt;Inbound traffic&lt;/h2&gt;
+
+&lt;p&gt;Edge node uses entity ID as a key to guarantee that all these IDs are coming through the same partition, preserving the sequence.&lt;/p&gt;
+
+&lt;p&gt;To save on latency, edge nodes do not parse the payload of the actual messages, passing it through, just using an envelope (entity ID as the key and adding connection ID and edge node own timestamp as attributes).&lt;/p&gt;
+
+&lt;p&gt;Message transport guarantees to deliver messages addressed to an instance entity with certain ID, ensuring it is one and only one instance at all available state nodes.
+This prevents split-brain scenarios in which different states under the same ID exist.&lt;/p&gt;
+
+&lt;p&gt;It is up to the state entity to process the message and ensure that it is valid and authorised, according to connection ID (JWT claims were sent in &lt;code class=&quot;highlighter-rouge&quot;&gt;connect&lt;/code&gt; when the connection was established) and edge node timestamp, to apply time-related logics.&lt;/p&gt;
+
+&lt;p&gt;Outbound messages (from stateful entities to the clients) contain a target lookup query, that targets either one client 
+connection by ID or all clients connected to a certain entity, maybe or some others.
+This allows saving on fan-out outbound traffic, when a message needs to be delivered to many clients at the same entity.
+All edge nodes listen to all messages in &lt;code class=&quot;highlighter-rouge&quot;&gt;outbound&lt;/code&gt; channel and use the lookups to send them to locally connected clients.&lt;/p&gt;
+
+&lt;h1 id=&quot;client-connections&quot;&gt;Client connections&lt;/h1&gt;
+
+&lt;p&gt;End-user device establishes a websocket connection to the public edge node, using token issued by identity service
+for authorisation.&lt;/p&gt;
+
+&lt;p&gt;The same device could establish and operation multiple connections at the same time, possibly via different edge nodes.&lt;/p&gt;
+
+&lt;p&gt;Internal devices may connect to internal edges by various means, authentication is per IP address or somehow per device class.
+Internal edges may implement any kind of interface, e.g. HTTP push, HTTP pull, websocket or UART/serial port.&lt;/p&gt;
+
+&lt;h3 id=&quot;security&quot;&gt;Security&lt;/h3&gt;
+&lt;p&gt;Websocket HTTP upgrade request carries &lt;code class=&quot;highlighter-rouge&quot;&gt;Authorization: Bearer xxx&lt;/code&gt; JWT token to authorise given client for connection.&lt;/p&gt;
+
+&lt;p&gt;The connection, in its URL, always addresses some stateful entity, and there’s protocol in place for joining/leaving the state.
+Public edge node validates JWT token signature, and passes claims of the token are sent to the state entity in the initial &lt;code class=&quot;highlighter-rouge&quot;&gt;connect&lt;/code&gt; message.
+The entity either accepts the client and sends state update message, or sends &lt;code class=&quot;highlighter-rouge&quot;&gt;terminate&lt;/code&gt; if the claims are not accepted.
+When connection is dropped by client, &lt;code class=&quot;highlighter-rouge&quot;&gt;disconnect&lt;/code&gt; message is sent to the entity, that could schedule handling of disconnect or wait till eventual &lt;code class=&quot;highlighter-rouge&quot;&gt;reconnect&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The claims in the token may contain specific end user roles, so the stateful entity knows who of the connected users is entitled to what.&lt;/p&gt;
+
+&lt;h3 id=&quot;attributes&quot;&gt;Attributes&lt;/h3&gt;
+&lt;p&gt;Each connection has the following attributes:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;connection ID - to track zombie connections/refreshes&lt;/li&gt;
+  &lt;li&gt;entity domain (uses same communication channel)&lt;/li&gt;
+  &lt;li&gt;domain entity ID (aggregate root within a domain)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;connection-id&quot;&gt;Connection ID&lt;/h3&gt;
+&lt;p&gt;Connection ID is generated as UUID by the client. Node doesn’t care about the ID content and assumes it’s just an unique string, long enough to prevent “insecure direct object reference” kind of guess attack.
+When a connection is dropped, client is required to reconnect keeping the same connection ID.&lt;/p&gt;
+
+&lt;h3 id=&quot;termination&quot;&gt;Termination&lt;/h3&gt;
+&lt;p&gt;Edge node, on request of the state entity or otherwise, can send &lt;code class=&quot;highlighter-rouge&quot;&gt;terminate&lt;/code&gt; message requesting end user device to close connection and either reconnect or go away.
+In particular, client connection is terminated upon session timeout or a forced logout.
+When client just goes away and closes the connection (in fact, when any kind of socket exception kills the connection), &lt;code class=&quot;highlighter-rouge&quot;&gt;terminated&lt;/code&gt; message is sent
+to the state entity. It is up to state entity to wait if the client comes back, ‘remembering’ him for some grace period, hoping that
+he comes back after a while, with same connection ID, applying any kind of custom ‘cleanup’ logics.&lt;/p&gt;</content><author><name>Tim Evdokimov</name></author><category term="concept" /><summary type="html">Real-time shared multi-user states with smooth scalability, flawless operations, quick feature delivery.</summary></entry><entry><title type="html">Observability of a reactive system: Introducing Akka Sensors</title><link href="https://jacum.github.io/akka-sensors/" rel="alternate" type="text/html" title="Observability of a reactive system: Introducing Akka Sensors" /><published>2021-01-03T00:00:00+00:00</published><updated>2021-01-03T00:00:00+00:00</updated><id>https://jacum.github.io/akka-sensors</id><content type="html" xml:base="https://jacum.github.io/akka-sensors/">&lt;h2 id=&quot;runnables&quot;&gt;Runnables&lt;/h2&gt;
+&lt;p&gt;Any reactive system, &lt;a href=&quot;https://www.reactivemanifesto.org/&quot;&gt;by definition&lt;/a&gt;, wants to be responsive, resilient and elastic, and therefore can’t be anything but message-driven. 
+Any action within such system is an asynchronous message that needs to be processed. 
+This takes a form of a &lt;code class=&quot;highlighter-rouge&quot;&gt;Runnable&lt;/code&gt;: data (message) + a snippet of code that needs to be executed to process the data.&lt;/p&gt;
+
+&lt;h2 id=&quot;dispatchers&quot;&gt;Dispatchers&lt;/h2&gt;
+
+&lt;p&gt;Therefore, at the heart of any reactive system, there is one or more &lt;em&gt;execution contexts&lt;/em&gt;.
+An execution context, backed by some sort of worker pool, accepts the &lt;code class=&quot;highlighter-rouge&quot;&gt;Runnable&lt;/code&gt; in its inbound queue. 
+When one of the context workers becomes available, the &lt;code class=&quot;highlighter-rouge&quot;&gt;Runnable&lt;/code&gt; is executed.&lt;/p&gt;
+
+&lt;p&gt;In Akka runtime, a &lt;code class=&quot;highlighter-rouge&quot;&gt;Runnable&lt;/code&gt; could be actor mailbox, processing one message, or just &lt;code class=&quot;highlighter-rouge&quot;&gt;ExecutionContext&lt;/code&gt; that handles futures or IO monad materialisation.&lt;/p&gt;
+
+&lt;p&gt;It is important to keep the number of worker to a healthy minimum: keeping too many idle workers incurs overhead. 
+Assigning them to CPU cores and removing one worker to assign another involves core context switch and is even more expensive.
+Hence, in an optimised low-latency reactive system, limited number of workers are occupying the cores all the time, without switching, 
+and just keep processing &lt;code class=&quot;highlighter-rouge&quot;&gt;Runnable&lt;/code&gt;s as they come.&lt;/p&gt;
+
+&lt;p&gt;To illustrate The following ‘supermarket’ metaphor could be applied.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/supermarket.jpg&quot; alt=&quot;Freepik image&quot; /&gt;
+&lt;sup&gt;(image courtesy of Freepik)&lt;/sup&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Runnable&lt;/code&gt;s are customers&lt;/li&gt;
+  &lt;li&gt;worker threads are the cashiers&lt;/li&gt;
+  &lt;li&gt;CPU cores are the cash registers&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If you are efficient supermarket manager, you want your customers to spend as little time in a queue as possible.&lt;/p&gt;
+
+&lt;p&gt;You could achieve that by opening many cash registers, but these are expensive and having them idle wastes money.
+So instead, you just open few of them and watch the following parameters:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;how much time a customer waited in a queue before being served? (queue time)&lt;/li&gt;
+  &lt;li&gt;how much time a customer spent being served by cashier? (run time)&lt;/li&gt;
+  &lt;li&gt;how many workers are actually occupied serving customers? (active workers)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;By tuning down the number of the workers to the necessary minimum, optimal latency is achieved.&lt;/p&gt;
+
+&lt;p&gt;There also can be situations when in an otherwise balanced shop, one customer is having issues with her payment and needs to call her husband to top the card balance.
+This blocks the cashier - he can’t do anything but wait - and all customers behind her, until she could pay (as you may have guessed, in a reactive system, it is a &lt;code class=&quot;highlighter-rouge&quot;&gt;Runnable&lt;/code&gt; that behaves non-reactively, blocking thread for I/O or a mutex/lock).
+We should’t call the police yet (kill the thread), but a note must be made of that customer and her behaviour. 
+By tracking such ‘misbehaving’ customers and correcting them, we could ensure that our cashiers are never blocked.&lt;/p&gt;
+
+&lt;h2 id=&quot;actors&quot;&gt;Actors&lt;/h2&gt;
+
+&lt;p&gt;In a reactive system, actors are stateful entities, forming transaction boundaries and guarding state integrity.&lt;/p&gt;
+
+&lt;p&gt;To understand the behaviour of the system under load, the following characteristics of an actor (a class of actors or any other group) must be monitored:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;how many of a given actor (class) instances are active in memory and for how long? how often are actors passivated (receive timeout triggered)?&lt;/li&gt;
+  &lt;li&gt;how much traffic does an actor (class) get?&lt;/li&gt;
+  &lt;li&gt;how much time does an actor (class) spend on processing a message?&lt;/li&gt;
+  &lt;li&gt;how many errors and unprocessed messages are there?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In addition, for persistent actors, that are recovered from durable storage:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;how many recovery events were replayed to recover actor (class) and how much time did it take?&lt;/li&gt;
+  &lt;li&gt;how much time a persistence actor (class) spends persisting an event?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This is essential information, that will allow engineers identify poor performance, excess resource use and root causes of incidents.&lt;/p&gt;
+
+&lt;h2 id=&quot;existing-solutions-for-akka&quot;&gt;Existing solutions for Akka&lt;/h2&gt;
+
+&lt;p&gt;Akka itself is free open source software at its core (Apache license), but to use the great &lt;a href=&quot;https://developer.lightbend.com/docs/telemetry/current/home.html&quot;&gt;Cinnamon telemetry library&lt;/a&gt;, commercial Lightbend subscription is required, which may not be affordable for every team.&lt;/p&gt;
+
+&lt;p&gt;As alternative, there is a metrics library called &lt;a href=&quot;https://kamon.io/&quot;&gt;Kamon&lt;/a&gt;, using attached agent and bytecode instrumentation, to expose Akka metrics. Kamon is suitable for testing and moderate loads, but by nature of its instrumentation, it adds too much overhead that can’t be acceptable in high-load production environments.&lt;/p&gt;
+
+&lt;p&gt;Teams working with Akka usually chose to implement their own custom metrics for Akka in production.&lt;/p&gt;
+
+&lt;h2 id=&quot;akka-sensors&quot;&gt;Akka Sensors&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/jacum/akka-sensors&quot;&gt;Akka Sensors&lt;/a&gt; is a new free open source (MIT) Scala library that instruments JVM and Akka explicitly, using native Prometheus collectors, with very low overhead, for high-load production use.&lt;/p&gt;
+
+&lt;p&gt;The sources are &lt;a href=&quot;https://github.com/jacum/akka-sensors&quot;&gt;published on Github&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;It is a greenfield implementation, not based on either Cinnamon or Kamon.&lt;/p&gt;
+
+&lt;p&gt;While the library itself is new as a package, the approaches and techniques applied are distilled from many years of production experience, implementing ad-hoc custom Akka/Prometheus metrics development, and from some OSS projects.&lt;/p&gt;
+
+&lt;p&gt;Key measurements performed on running actors, Akka dispatchers, Cassandra client. An optional ‘runnable watcher’, configurable per dispatcher, keeps an eye on runnables, reporting stack traces of those rogue ones, hanging too long on non-reactive activities: e.g. waiting for locks, or doing blocking I/O.&lt;/p&gt;
+
+&lt;p&gt;Collected metrics are indeed not as extensive as with Cinnamon, at the moment, most notably lacking the automatic instrumentation for cluster/sharding and remote traffic between cluster nodes.&lt;/p&gt;
+
+&lt;p&gt;It comes with set of pre-configured Grafana boards and example application (&lt;a href=&quot;https://http4s.org&quot;&gt;http4s API&lt;/a&gt; + Akka + &lt;a href=&quot;https://cassandra.apache.org/&quot;&gt;Cassandra&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;Actor dashboard:
+&lt;img src=&quot;https://github.com/jacum/akka-sensors/raw/master/docs/akka-actors.png&quot; alt=&quot;Actor dashbord&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Dispatcher dashboard:
+&lt;img src=&quot;https://github.com/jacum/akka-sensors/raw/master/docs/akka-dispatchers.png&quot; alt=&quot;Dispatcher dashbord&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;h3 id=&quot;akka&quot;&gt;Akka&lt;/h3&gt;
+&lt;p&gt;Akka appeared in 2009. At its core is an implementation of actor model, as known from Erlang, rewritten in Scala. Actors are stateful entities, communicating with each other asynchronously, by passing messages around. Each actor is guaranteed to process just one message a time, allowing for lock-free mutable state updates.&lt;/p&gt;
+
+&lt;p&gt;On top of actors keeping their state in memory, there is Akka Persistence, adding robust event sourcing, and Akka Cluster with Sharding to distribute persistent actor on available cluster nodes. Backed by scalable database such as Cassandra and scalable streaming such as Kafka, the result is a platform for nearly-infinite scalable system.&lt;/p&gt;
+
+&lt;p&gt;It took few years to mature into industrial quality software, and now Akka is being successfully used highly concurrent event processing systems across wide variety of industries: from gambling to banking, and from postal logistics to IoT - where each millisecond in latency matters, and data is extremely valuable. Scaling such a system to process 10x times the current load is solved by adding hardware, but, generally, without rewriting any code.&lt;/p&gt;
+
+&lt;h3 id=&quot;prometheus&quot;&gt;Prometheus&lt;/h3&gt;
+
+&lt;p&gt;Prometheus is free open source (Apache) time-series database that is widely used to keep process metrics.&lt;/p&gt;
+
+&lt;p&gt;Prometheus collectors for JVM could be enhanced with any kind of metrics to collect, using very low-overhead concurrent JVM primitives.&lt;/p&gt;</content><author><name>Tim Evdokimov</name></author><category term="akka" /><summary type="html">Inline explicit instrumentation of Akka with Prometheus, with negligible overhead, open-source (MIT) and suitable for production use.</summary></entry></feed>
